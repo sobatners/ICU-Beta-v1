@@ -1,0 +1,27 @@
+{
+  "name": "Catatan Praktek Perawat ICU",
+  "short_name": "ICU Drug Ref",
+  "description": "Referensi Obat OT & ICU – SSC 2026 | AHA 2025 | DAS 2025 | Untuk Mahasiswa Keperawatan",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#FFFDE7",
+  "theme_color": "#1565C0",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["medical", "education"],
+  "lang": "id",
+  "screenshots": []
+}

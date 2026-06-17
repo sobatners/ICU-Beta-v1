@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1565C0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ICU Drug Ref">
+<meta name="description" content="Catatan Praktek Perawat ICU - Referensi Obat OT & ICU">
+<title>Catatan Praktek Perawat ICU</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FFFDE7;
+    --paper: #FFFEF5;
+    --blue: #1565C0;
+    --teal: #00695C;
+    --red: #C62828;
+    --orange: #E65100;
+    --purple: #6A1B9A;
+    --green: #2E7D32;
+    --yellow-hl: #FFF176;
+    --green-hl: #CCFF90;
+    --pink-hl: #FF80AB;
+    --blue-hl: #80D8FF;
+    --orange-hl: #FFD180;
+    --purple-hl: #E1BEE7;
+    --line-color: #BBDEFB;
+    --margin-line: #EF9A9A;
+    --ink: #1A1A2E;
+    --note-font: 'Caveat', cursive;
+    --ui-font: 'Poppins', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--ui-font);
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ====== LOGIN SCREEN ====== */
+  #loginScreen {
+    position: fixed; inset: 0; z-index: 9999;
+    background: linear-gradient(135deg, #1565C0 0%, #0D47A1 40%, #6A1B9A 100%);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+  }
+
+  .login-card {
+    background: rgba(255,255,255,0.97);
+    border-radius: 24px;
+    padding: 40px 48px;
+    width: 380px;
+    max-width: 92vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 6px;
+    background: linear-gradient(90deg, #1565C0, #6A1B9A, #C62828);
+  }
+
+  .login-logo {
+    font-size: 56px; margin-bottom: 8px;
+  }
+
+  .login-title {
+    font-size: 20px; font-weight: 700; color: #1565C0; margin-bottom: 4px;
+  }
+
+  .login-subtitle {
+    font-size: 12px; color: #666; margin-bottom: 28px;
+  }
+
+  .login-field {
+    position: relative; margin-bottom: 16px;
+  }
+
+  .login-field label {
+    display: block; text-align: left; font-size: 12px;
+    font-weight: 600; color: #555; margin-bottom: 6px;
+  }
+
+  .login-field input {
+    width: 100%; padding: 12px 16px;
+    border: 2px solid #E0E0E0;
+    border-radius: 10px; font-size: 15px;
+    font-family: var(--ui-font);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  .login-field input:focus { border-color: #1565C0; }
+
+  .login-btn {
+    width: 100%; padding: 14px;
+    background: linear-gradient(135deg, #1565C0, #0D47A1);
+    color: white; border: none; border-radius: 10px;
+    font-size: 16px; font-weight: 600;
+    cursor: pointer; margin-top: 8px;
+    transition: transform 0.15s, box-shadow 0.15s;
+    font-family: var(--ui-font);
+  }
+
+  .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(21,101,192,0.4); }
+  .login-btn:active { transform: translateY(0); }
+
+  .login-error {
+    color: #C62828; font-size: 12px; margin-top: 8px;
+    display: none; background: #FFEBEE; padding: 8px;
+    border-radius: 6px;
+  }
+
+  .login-hint {
+    font-size: 11px; color: #999; margin-top: 16px;
+  }
+
+  /* ====== MAIN APP ====== */
+  #app { display: none; }
+
+  /* Sticky header */
+  .app-header {
+    background: linear-gradient(135deg, #1565C0, #0D47A1);
+    color: white; padding: 12px 20px;
+    display: flex; align-items: center; gap: 12px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+
+  .app-header h1 {
+    font-size: 16px; font-weight: 700; flex: 1;
+    font-family: var(--note-font); font-size: 22px;
+  }
+
+  .install-btn {
+    background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+    color: white; padding: 6px 12px; border-radius: 8px;
+    font-size: 12px; cursor: pointer; font-family: var(--ui-font);
+    transition: background 0.2s;
+  }
+
+  .install-btn:hover { background: rgba(255,255,255,0.3); }
+
+  .logout-btn {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    color: white; padding: 6px 10px; border-radius: 8px;
+    font-size: 12px; cursor: pointer; font-family: var(--ui-font);
+  }
+
+  /* Search */
+  .search-bar {
+    padding: 10px 20px;
+    background: #E3F2FD; position: sticky; top: 98px; z-index: 99;
+    border-bottom: 2px solid #BBDEFB;
+  }
+
+  .search-bar input {
+    width: 100%; padding: 10px 16px;
+    border: 2px solid #90CAF9; border-radius: 12px;
+    font-size: 14px; font-family: var(--ui-font);
+    background: white; outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-bar input:focus { border-color: #1565C0; }
+
+  /* Category tabs */
+  .category-tabs {
+    display: flex; gap: 6px; padding: 10px 16px;
+    overflow-x: auto; background: #F8F9FA;
+    border-bottom: 1px solid #E0E0E0;
+    scrollbar-width: thin;
+  }
+
+  .cat-tab {
+    white-space: nowrap; padding: 6px 14px;
+    border-radius: 20px; border: none;
+    font-size: 12px; font-family: var(--ui-font);
+    cursor: pointer; font-weight: 600;
+    transition: all 0.2s;
+    background: #E8EAF6; color: #283593;
+  }
+
+  .cat-tab.active { background: #1565C0; color: white; }
+  .cat-tab:hover { opacity: 0.8; }
+
+  /* Main content */
+  .content {
+    max-width: 1200px; margin: 0 auto;
+    padding: 16px;
+  }
+
+  /* Note paper card */
+  .drug-card {
+    background: var(--paper);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-left: 5px solid var(--blue);
+    overflow: hidden;
+    position: relative;
+    /* Lined paper effect */
+    background-image: 
+      linear-gradient(var(--line-color) 1px, transparent 1px);
+    background-size: 100% 28px;
+    background-position: 0 24px;
+  }
+
+  .drug-card.hidden { display: none; }
+
+  .section-header {
+    padding: 10px 16px;
+    font-size: 14px; font-weight: 700;
+    color: white;
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .section-header .toggle-icon {
+    margin-left: auto; font-size: 18px;
+    transition: transform 0.3s;
+  }
+
+  .section-header.collapsed .toggle-icon { transform: rotate(-90deg); }
+
+  .section-content { padding: 0 12px 12px; }
+  .section-content.collapsed { display: none; }
+
+  /* Drug entry */
+  .drug-entry {
+    background: rgba(255,255,255,0.85);
+    border-radius: 8px; margin: 8px 0;
+    padding: 12px 14px;
+    border: 1px solid #E0E0E0;
+    font-family: var(--note-font);
+    position: relative;
+    transition: box-shadow 0.2s;
+  }
+
+  .drug-entry:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+  .drug-name {
+    font-size: 22px; font-weight: 700;
+    color: var(--blue);
+    margin-bottom: 4px;
+    display: flex; align-items: center; gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .drug-badge {
+    font-size: 11px; padding: 2px 8px;
+    border-radius: 12px; font-family: var(--ui-font);
+    font-weight: 600;
+  }
+
+  .badge-rsi { background: var(--yellow-hl); color: #5D4037; }
+  .badge-firstline { background: var(--green-hl); color: #1B5E20; }
+  .badge-danger { background: var(--pink-hl); color: #880E4F; }
+  .badge-icu { background: var(--blue-hl); color: #01579B; }
+
+  .drug-row {
+    margin: 3px 0; font-size: 17px; line-height: 1.5;
+    padding: 2px 4px; border-radius: 4px;
+  }
+
+  .drug-row .label {
+    font-weight: 700; font-size: 13px;
+    font-family: var(--ui-font);
+    display: inline-block; min-width: 70px;
+    color: #555;
+  }
+
+  .hl-yellow { background: var(--yellow-hl); padding: 0 3px; border-radius: 3px; }
+  .hl-green { background: var(--green-hl); padding: 0 3px; border-radius: 3px; }
+  .hl-pink { background: var(--pink-hl); padding: 0 3px; border-radius: 3px; }
+  .hl-blue { background: var(--blue-hl); padding: 0 3px; border-radius: 3px; }
+  .hl-orange { background: var(--orange-hl); padding: 0 3px; border-radius: 3px; }
+
+  .text-green { color: #2E7D32; }
+  .text-red { color: #C62828; font-weight: 600; }
+  .text-orange { color: #E65100; font-weight: 600; }
+
+  .warning-box {
+    background: #FFEBEE; border-left: 4px solid #C62828;
+    border-radius: 4px; padding: 6px 10px; margin-top: 6px;
+    font-size: 15px; color: #B71C1C;
+  }
+
+  .important-box {
+    background: #FFF3E0; border-left: 4px solid #FF6D00;
+    border-radius: 4px; padding: 6px 10px; margin-top: 6px;
+    font-size: 15px; color: #E65100;
+    font-family: var(--ui-font); font-size: 12px;
+  }
+
+  /* Calculator */
+  .calc-toggle {
+    background: linear-gradient(135deg, #1565C0, #6A1B9A);
+    color: white; border: none; border-radius: 20px;
+    padding: 5px 12px; font-size: 11px;
+    cursor: pointer; font-family: var(--ui-font); font-weight: 600;
+    margin-top: 6px;
+  }
+
+  .calc-panel {
+    background: #E8EAF6; border-radius: 8px;
+    padding: 12px; margin-top: 8px; display: none;
+    border: 1px solid #C5CAE9;
+  }
+
+  .calc-panel.show { display: block; }
+
+  .calc-panel h4 {
+    font-size: 12px; font-family: var(--ui-font);
+    color: #283593; margin-bottom: 8px;
+  }
+
+  .calc-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px; flex-wrap: wrap;
+  }
+
+  .calc-row label {
+    font-size: 12px; font-family: var(--ui-font); color: #555;
+    white-space: nowrap;
+  }
+
+  .calc-row input, .calc-row select {
+    padding: 6px 10px; border: 1px solid #9FA8DA;
+    border-radius: 6px; font-size: 13px;
+    font-family: var(--ui-font); width: 100px;
+    outline: none;
+  }
+
+  .calc-btn {
+    background: #1565C0; color: white; border: none;
+    border-radius: 6px; padding: 6px 14px;
+    font-size: 12px; cursor: pointer; font-family: var(--ui-font);
+  }
+
+  .calc-result {
+    background: #FFFDE7; border-radius: 6px;
+    padding: 8px 12px; margin-top: 8px;
+    font-family: var(--note-font); font-size: 20px;
+    color: #1565C0; min-height: 36px;
+    border: 1px solid #FFF176;
+  }
+
+  .unit-convert {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;
+  }
+
+  .unit-btn {
+    background: #E3F2FD; border: 1px solid #90CAF9;
+    border-radius: 6px; padding: 4px 10px; font-size: 11px;
+    cursor: pointer; font-family: var(--ui-font);
+    color: #0D47A1;
+  }
+
+  .unit-btn:hover { background: #90CAF9; }
+
+  /* SSC Banner */
+  .ssc-banner {
+    background: linear-gradient(135deg, #E65100, #BF360C);
+    color: white; border-radius: 12px;
+    padding: 12px 16px; margin-bottom: 16px;
+    font-family: var(--note-font); font-size: 18px;
+    line-height: 1.7;
+  }
+
+  .ssc-banner h3 {
+    font-size: 20px; margin-bottom: 6px;
+    font-family: var(--ui-font);
+  }
+
+  /* Floating install prompt */
+  .install-prompt {
+    position: fixed; bottom: 20px; right: 20px;
+    background: #1565C0; color: white;
+    border-radius: 16px; padding: 14px 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    z-index: 1000; max-width: 280px;
+    display: none;
+  }
+
+  .install-prompt h4 { font-size: 14px; margin-bottom: 6px; }
+  .install-prompt p { font-size: 12px; opacity: 0.85; margin-bottom: 10px; }
+  .install-prompt-btns { display: flex; gap: 8px; }
+  .install-prompt-btns button {
+    padding: 7px 14px; border-radius: 8px; font-size: 12px;
+    cursor: pointer; font-family: var(--ui-font); font-weight: 600;
+    border: none;
+  }
+  .btn-install { background: white; color: #1565C0; }
+  .btn-dismiss { background: rgba(255,255,255,0.2); color: white; }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; border-top: 1px solid #E0E0E0;
+    display: flex; justify-content: space-around;
+    padding: 8px 0;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    z-index: 98;
+  }
+
+  .bottom-nav-btn {
+    display: flex; flex-direction: column; align-items: center;
+    font-size: 10px; color: #666; cursor: pointer;
+    padding: 4px 12px; border-radius: 8px;
+    border: none; background: none;
+    font-family: var(--ui-font);
+    transition: color 0.2s;
+  }
+
+  .bottom-nav-btn.active { color: #1565C0; }
+  .bottom-nav-btn span:first-child { font-size: 20px; }
+
+  .main-content-wrapper { padding-bottom: 70px; }
+
+  /* View screens */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Bookmarks */
+  .bookmark-btn {
+    position: absolute; top: 8px; right: 8px;
+    background: none; border: none; cursor: pointer;
+    font-size: 20px; opacity: 0.5; transition: opacity 0.2s;
+  }
+
+  .bookmark-btn.saved { opacity: 1; }
+  .bookmark-btn:hover { opacity: 0.8; }
+
+  /* About screen */
+  .about-card {
+    background: white; border-radius: 16px;
+    padding: 24px; margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+
+  .promo-poster {
+    background: linear-gradient(135deg, #1565C0 0%, #6A1B9A 50%, #C62828 100%);
+    border-radius: 16px; padding: 24px; color: white;
+    text-align: center; margin-bottom: 16px;
+    position: relative; overflow: hidden;
+  }
+
+  .promo-poster::before {
+    content: ''; position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: repeating-linear-gradient(
+      45deg, transparent, transparent 40px,
+      rgba(255,255,255,0.03) 40px, rgba(255,255,255,0.03) 80px
+    );
+  }
+
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+
+  .drug-card { animation: fadeIn 0.3s ease forwards; }
+
+  /* Responsive */
+  @media (min-width: 768px) {
+    .content { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .ssc-banner { grid-column: 1 / -1; }
+  }
+
+  @media (min-width: 1100px) {
+    .content { grid-template-columns: 1fr 1fr 1fr; }
+  }
+
+  /* ====== TITRASI KALKULATOR ====== */
+  .titrasi-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px; flex-wrap: wrap;
+  }
+  .titrasi-row label {
+    font-size: 11px; font-family: var(--ui-font); color: #555;
+    white-space: nowrap; min-width: 120px;
+  }
+  .titrasi-row input {
+    padding: 5px 8px; border: 1px solid #9FA8DA;
+    border-radius: 6px; font-size: 12px;
+    font-family: var(--ui-font); width: 90px; outline: none;
+  }
+  .titrasi-result {
+    background: linear-gradient(135deg, #E3F2FD, #EDE7F6);
+    border-radius: 8px; padding: 10px 14px; margin-top: 8px;
+    font-family: var(--note-font); font-size: 20px;
+    color: #1565C0; border: 1px solid #90CAF9;
+    line-height: 1.8;
+  }
+  .brand-box {
+    background: #F3E5F5; border-left: 4px solid #7B1FA2;
+    border-radius: 4px; padding: 6px 10px; margin-top: 6px;
+    font-size: 12px; color: #4A148C;
+    font-family: var(--ui-font);
+  }
+
+  /* ====== MODAL TOOLS ====== */
+  .tool-modal-overlay {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(0,0,0,0.6);
+    display: none; align-items: flex-start; justify-content: center;
+    padding: 16px; overflow-y: auto;
+  }
+  .tool-modal-overlay.open { display: flex; }
+  .tool-modal {
+    background: #FFFEF5; border-radius: 16px;
+    width: 100%; max-width: 640px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    overflow: hidden; margin: auto;
+    background-image: linear-gradient(var(--line-color) 1px, transparent 1px);
+    background-size: 100% 28px; background-position: 0 24px;
+  }
+  .tool-modal-header {
+    background: linear-gradient(135deg, #1565C0, #0D47A1);
+    color: white; padding: 14px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .tool-modal-header h2 { font-size: 18px; font-family: var(--note-font); flex:1; }
+  .tool-modal-close {
+    background: rgba(255,255,255,0.2); border: none; color: white;
+    border-radius: 50%; width: 32px; height: 32px;
+    font-size: 18px; cursor: pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .tool-modal-body { padding: 16px; }
+
+  .score-section {
+    background: rgba(255,255,255,0.85); border-radius: 10px;
+    border: 1px solid #E0E0E0; padding: 14px; margin-bottom: 12px;
+  }
+  .score-section h3 { font-size: 14px; font-family: var(--ui-font); color: #1565C0; margin-bottom: 10px; }
+  .score-item { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px; }
+  .score-item label { font-size: 13px; font-family: var(--ui-font); color: #333; flex:1; min-width:180px; }
+  .score-item select, .score-item input[type=number] {
+    padding: 5px 8px; border: 1px solid #9FA8DA; border-radius: 6px;
+    font-size: 12px; font-family: var(--ui-font); outline: none; min-width: 100px;
+  }
+  .score-result-box {
+    background: linear-gradient(135deg, #1565C0, #6A1B9A);
+    color: white; border-radius: 12px; padding: 16px;
+    margin-top: 12px; text-align: center; font-family: var(--note-font);
+  }
+  .score-result-box .score-num { font-size: 52px; line-height:1; }
+  .score-result-box .score-label { font-size: 20px; margin-top: 4px; }
+  .score-result-box .score-interp { font-size: 14px; opacity: 0.9; font-family: var(--ui-font); margin-top: 6px; }
+  .score-btn {
+    width: 100%; padding: 12px; background: linear-gradient(135deg, #1565C0, #0D47A1);
+    color: white; border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: var(--ui-font); margin-top: 10px;
+  }
+  .score-btn:hover { opacity: 0.9; }
+  .score-criteria-table { width:100%; border-collapse:collapse; font-size:12px; font-family:var(--ui-font); margin-top:8px; }
+  .score-criteria-table th { background:#1565C0; color:white; padding:6px 8px; text-align:left; }
+  .score-criteria-table td { padding:5px 8px; border-bottom:1px solid #E0E0E0; }
+  .score-criteria-table tr:nth-child(even) td { background:#F5F5F5; }
+  .interp-card { border-radius:8px; padding:8px 12px; margin-bottom:6px; font-size:13px; font-family:var(--ui-font); }
+  .interp-green { background:#E8F5E9; border-left:4px solid #2E7D32; color:#1B5E20; }
+  .interp-yellow { background:#FFFDE7; border-left:4px solid #F9A825; color:#5D4037; }
+  .interp-orange { background:#FFF3E0; border-left:4px solid #E65100; color:#BF360C; }
+  .interp-red { background:#FFEBEE; border-left:4px solid #C62828; color:#B71C1C; }
+
+  /* Navbar tools */
+  .navbar-tools {
+    background: #0D47A1; padding: 6px 16px;
+    display: flex; gap: 6px; overflow-x: auto;
+    scrollbar-width: thin; border-bottom: 2px solid rgba(255,255,255,0.1);
+  }
+  .navbar-tool-btn {
+    white-space: nowrap; padding: 5px 12px;
+    border-radius: 20px; border: 1px solid rgba(255,255,255,0.3);
+    font-size: 11px; font-family: var(--ui-font);
+    cursor: pointer; font-weight: 600;
+    background: rgba(255,255,255,0.1); color: white;
+    transition: all 0.2s;
+  }
+  .navbar-tool-btn:hover { background: rgba(255,255,255,0.25); }
+
+  /* Tab content in modal */
+  .modal-tabs { display:flex; gap:4px; margin-bottom:12px; flex-wrap:wrap; }
+  .modal-tab { padding:5px 12px; border-radius:20px; border:1px solid #C5CAE9;
+    font-size:11px; font-family:var(--ui-font); cursor:pointer;
+    background:#E8EAF6; color:#283593; font-weight:600; }
+  .modal-tab.active { background:#1565C0; color:white; border-color:#1565C0; }
+  .modal-tab-content { display:none; }
+  .modal-tab-content.active { display:block; }
+</style>
+</head>
+<body>
+
+<!-- ====== LOGIN SCREEN ====== -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">🏥</div>
+    <div class="login-title">Catatan Praktek Perawat ICU</div>
+    <div class="login-subtitle">KarthikMD OT & ICU Drug Reference | SSC 2026 | AHA 2025</div>
+    
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="username" placeholder="Masukkan username..." autocomplete="username">
+    </div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Masukkan password..." autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-error" id="loginError">❌ Username atau password salah. Coba lagi.</div>
+    <button class="login-btn" onclick="doLogin()">🔓 Masuk ke Catatan</button>
+    <div class="login-hint">💡 Untuk demo: <b>perawat</b> / <b>icu2026</b></div>
+  </div>
+</div>
+
+<!-- ====== MAIN APP ====== -->
+<div id="app">
+  <div class="app-header">
+    <span style="font-size:24px">📋</span>
+    <h1>Catatan Perawat ICU</h1>
+    <button class="install-btn" id="installBtn" style="display:none" onclick="installApp()">📲 Pasang</button>
+    <button class="logout-btn" onclick="logout()">Keluar</button>
+  </div>
+
+  <!-- NAVBAR TOOLS -->
+  <div class="navbar-tools">
+    <button class="navbar-tool-btn" onclick="openModal('modalTitrasi')">💉 Titrasi Drip</button>
+    <button class="navbar-tool-btn" onclick="openModal('modalQSOFA')">🧮 SOFA Score</button>
+    <button class="navbar-tool-btn" onclick="openModal('modalAPACHE')">📊 APACHE II</button>
+    <button class="navbar-tool-btn" onclick="openModal('modalAcidBase')">🩸 Asam-Basa</button>
+    <button class="navbar-tool-btn" onclick="openModal('modalVentilator')">🫁 Ventilator</button>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="🔍 Cari obat (mis: propofol, morphine, noradrenalin)..." 
+           oninput="searchDrugs(this.value)">
+  </div>
+
+  <div class="category-tabs" id="categoryTabs">
+    <button class="cat-tab active" onclick="filterCategory('all', this)">🔬 Semua</button>
+    <button class="cat-tab" onclick="filterCategory('antiemetic', this)">💊 Antiemetik</button>
+    <button class="cat-tab" onclick="filterCategory('sedative', this)">😴 Sedatif</button>
+    <button class="cat-tab" onclick="filterCategory('opioid', this)">🌡️ Analgesik</button>
+    <button class="cat-tab" onclick="filterCategory('nmb', this)">💉 NMB</button>
+    <button class="cat-tab" onclick="filterCategory('vaso', this)">❤️ Vasopressor</button>
+    <button class="cat-tab" onclick="filterCategory('antihyp', this)">📊 Antihipertensi</button>
+    <button class="cat-tab" onclick="filterCategory('fluid', this)">💧 Cairan</button>
+    <button class="cat-tab" onclick="filterCategory('steroid', this)">🫁 Steroid</button>
+    <button class="cat-tab" onclick="filterCategory('antidote', this)">⚗️ Antidot</button>
+    <button class="cat-tab" onclick="filterCategory('saved', this)">⭐ Tersimpan</button>
+  </div>
+
+  <div class="main-content-wrapper">
+    <div class="screen active" id="screenDrugs">
+      <div class="content" id="drugContent">
+        <!-- SSC Banner -->
+        <div class="ssc-banner drug-card" data-cat="all">
+          <h3>📌 PANDUAN KRITIS – SSC 2026 | AHA 2025 | DAS 2025</h3>
+          ✅ Noradrenalin LINI PERTAMA syok septik → Tambah Vasopressin 0.03 U/mnt saat eskalasi → Tambah Adrenalin bila perlu<br>
+          ✅ Kristaloid BERIMBANG (Plasmalyte/RL) lebih dipilih dari NaCl 0.9% – diupgrade SSC 2026<br>
+          ✅ Antibiotik broad-spectrum dalam <b>1 JAM</b> untuk syok septik | <b>3 JAM</b> untuk sepsis<br>
+          ⚠️ Dopamine TIDAK lagi first-line | Vasopressin TIDAK untuk henti jantung (AHA 2025) | Terlipressin JANGAN untuk syok septik
+        </div>
+
+        <!-- DRUGS DATA RENDERED BY JS -->
+      </div>
+    </div>
+
+    <div class="screen" id="screenAbout">
+      <div class="content" style="display:block">
+        <div class="promo-poster">
+          <h2 style="font-size:28px;margin-bottom:8px;position:relative">🏆 Mengapa Catatan Perawat ICU?</h2>
+          <p style="font-size:16px;opacity:0.9;position:relative">Referensi obat terlengkap & terkini untuk mahasiswa keperawatan & praktisi ICU</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;position:relative">
+            <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:14px">
+              <div style="font-size:32px">📚</div>
+              <b>150+ Obat</b><br><small>16 Kategori Lengkap</small>
+            </div>
+            <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:14px">
+              <div style="font-size:32px">🧮</div>
+              <b>Kalkulator Dosis</b><br><small>Otomatis per BB</small>
+            </div>
+            <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:14px">
+              <div style="font-size:32px">📲</div>
+              <b>Bisa Dipasang</b><br><small>Seperti Aplikasi Asli</small>
+            </div>
+            <div style="background:rgba(255,255,255,0.15);border-radius:12px;padding:14px">
+              <div style="font-size:32px">🔄</div>
+              <b>SSC 2026 Terbaru</b><br><small>AHA 2025 | DAS 2025</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-card">
+          <h3 style="color:#1565C0;margin-bottom:12px">💎 Keunggulan Materi Ini</h3>
+          <ul style="list-style:none;line-height:2">
+            <li>✅ Panduan guideline terbaru SSC 2026, AHA 2025, DAS 2025</li>
+            <li>✅ 150+ obat esensial dalam 16 kategori</li>
+            <li>✅ Dosis, rute, indikasi & efek samping per obat</li>
+            <li>✅ Stabilo digital dengan highlight penting</li>
+            <li>✅ Terjemahan Bahasa Indonesia (nama obat & medis tetap)</li>
+            <li>✅ Kalkulator dosis otomatis per berat badan</li>
+            <li>✅ Konversi satuan: g ↔ mg ↔ mcg ↔ IU</li>
+          </ul>
+        </div>
+
+        <div class="about-card" style="background:linear-gradient(135deg,#E8F5E9,#F1F8E9)">
+          <h3 style="color:#2E7D32;margin-bottom:12px">📱 Cara Pasang di Homescreen</h3>
+          <p style="font-size:14px;line-height:1.8">
+            <b>Android (Chrome):</b><br>
+            Menu ⋮ → "Tambahkan ke Layar Utama" → Pasang<br><br>
+            <b>iPhone (Safari):</b><br>
+            Tombol Bagikan ⬆️ → "Tambah ke Layar Utama" → Tambah<br><br>
+            <i style="color:#666">Setelah dipasang, bisa dibuka tanpa internet!</i>
+          </p>
+        </div>
+
+        <div class="about-card" style="background:linear-gradient(135deg,#FFF3E0,#FBE9E7);text-align:center">
+          <h3 style="color:#E65100;margin-bottom:8px">📣 Dapatkan Materi Lengkap!</h3>
+          <p style="font-size:14px;margin-bottom:16px">Suka dengan catatan ini? Dapatkan versi lengkap dengan MCQ berbasis bukti di</p>
+          <div style="background:white;border-radius:12px;padding:16px;display:inline-block">
+            <div style="font-size:32px">🌐</div>
+            <b style="color:#1565C0">www.KarthikMD.com</b><br>
+            <small style="color:#666">App Store & Play Store: AN MCQ App</small>
+          </div>
+          <br><br>
+          <p style="font-size:16px;font-weight:700;color:#C62828">💰 Harga Terjangkau – DM Admin!</p>
+          <p style="font-size:13px;color:#666">Cocok untuk mahasiswa keperawatan & dokter muda</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="bottom-nav-btn active" id="navDrugs" onclick="showScreen('drugs')">
+      <span>💊</span><span>Obat</span>
+    </button>
+    <button class="bottom-nav-btn" id="navBookmarks" onclick="showScreen('bookmarks')">
+      <span>⭐</span><span>Simpan</span>
+    </button>
+    <button class="bottom-nav-btn" id="navAbout" onclick="showScreen('about')">
+      <span>ℹ️</span><span>Info</span>
+    </button>
+  </div>
+</div>
+
+<!-- ====== MODAL: TITRASI DRIP ====== -->
+<div class="tool-modal-overlay" id="modalTitrasi">
+  <div class="tool-modal">
+    <div class="tool-modal-header" style="background:linear-gradient(135deg,#1565C0,#6A1B9A)">
+      <span style="font-size:24px">💉</span>
+      <h2>Kalkulator Titrasi Drip ICU</h2>
+      <button class="tool-modal-close" onclick="closeModal('modalTitrasi')">✕</button>
+    </div>
+    <div class="tool-modal-body">
+      <div class="score-section">
+        <h3>⚙️ Konsentrasi Sediaan</h3>
+        <div class="titrasi-row">
+          <label>Obat (mg):</label>
+          <input type="number" id="tr_drug_mg" value="50" min="0.001" step="any">
+        </div>
+        <div class="titrasi-row">
+          <label>Dalam cairan (mL):</label>
+          <input type="number" id="tr_drug_ml" value="50" min="1" step="1">
+        </div>
+        <div class="titrasi-row">
+          <label>BB pasien (kg):</label>
+          <input type="number" id="tr_bb" value="60" min="1" step="0.5">
+        </div>
+        <div class="titrasi-row">
+          <label>Dosis target:</label>
+          <input type="number" id="tr_dose_val" value="0.1" step="any" style="width:70px">
+          <select id="tr_dose_unit" style="padding:5px;border:1px solid #9FA8DA;border-radius:6px;font-size:12px">
+            <option>mcg/kg/mnt</option>
+            <option>mcg/kg/jam</option>
+            <option>mg/kg/jam</option>
+            <option>mcg/mnt</option>
+            <option>mg/jam</option>
+            <option>unit/mnt</option>
+            <option>unit/jam</option>
+          </select>
+        </div>
+        <button class="score-btn" onclick="hitungTitrasi()">🧮 Hitung mL/jam</button>
+        <div class="titrasi-result" id="tr_result">Isi data di atas lalu klik Hitung...</div>
+      </div>
+      <div class="score-section">
+        <h3>📌 Preset Obat Vasopressor / Sedasi Umum</h3>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="unit-btn" onclick="presetTitrasi('Noradrenalin','50','50',0.1,'mcg/kg/mnt','Levophed, Norepinephrine','4 mg/4 mL amp')">Noradrenalin</button>
+          <button class="unit-btn" onclick="presetTitrasi('Dopamin','200','50',5,'mcg/kg/mnt','Dopamin HCl Generik','200 mg/5 mL amp')">Dopamin</button>
+          <button class="unit-btn" onclick="presetTitrasi('Dobutamin','250','50',5,'mcg/kg/mnt','Dobuject, Inotrop','250 mg/20 mL amp')">Dobutamin</button>
+          <button class="unit-btn" onclick="presetTitrasi('Adrenalin','1','50',0.05,'mcg/kg/mnt','Epinefrin Generik','1 mg/1 mL amp')">Adrenalin</button>
+          <button class="unit-btn" onclick="presetTitrasi('Propofol','500','50',50,'mcg/kg/mnt','Diprivan, Fresofol','200 mg/20 mL, 500 mg/50 mL')">Propofol</button>
+          <button class="unit-btn" onclick="presetTitrasi('Midazolam','15','50',0.05,'mg/kg/jam','Dormicum, Miloz','15 mg/3 mL amp')">Midazolam</button>
+          <button class="unit-btn" onclick="presetTitrasi('Dexmedetomidin','0.2','50',0.4,'mcg/kg/jam','Precedex','200 mcg/2 mL amp')">Dexmed</button>
+          <button class="unit-btn" onclick="presetTitrasi('Fentanyl','0.5','50',1,'mcg/kg/jam','Fentanyl Generik','500 mcg/10 mL amp')">Fentanyl</button>
+          <button class="unit-btn" onclick="presetTitrasi('Vasopressin','20','50',0.03,'unit/mnt','Pitressin','20 unit/mL amp')">Vasopressin</button>
+          <button class="unit-btn" onclick="presetTitrasi('Heparin','25000','50',15,'unit/kg/jam','Inviclot, Heparin Na','5000 unit/mL')">Heparin</button>
+        </div>
+        <div class="brand-box" id="tr_brand" style="display:none"></div>
+      </div>
+      <div class="important-box">💡 <b>Rumus:</b> mL/jam = (Dosis × BB × 60) ÷ Konsentrasi (mg/mL) — Untuk dosis mg/jam: mL/jam = Dosis ÷ Konsentrasi</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: SOFA ====== -->
+<div class="tool-modal-overlay" id="modalQSOFA">
+  <div class="tool-modal">
+    <div class="tool-modal-header" style="background:linear-gradient(135deg,#C62828,#880E4F)">
+      <span style="font-size:24px">🧮</span>
+      <h2>SOFA Score – Sepsis & Disfungsi Organ</h2>
+      <button class="tool-modal-close" onclick="closeModal('modalQSOFA')">✕</button>
+    </div>
+    <div class="tool-modal-body">
+      <p style="font-size:12px;font-family:var(--ui-font);color:#555;margin-bottom:12px">Sequential Organ Failure Assessment (Sepsis-3). Sepsis = infeksi + SOFA ≥2 dari baseline. Syok septik = vasopressor + laktat &gt;2 mmol/L.</p>
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="switchTab('sofa','score')">Hitung Skor</button>
+        <button class="modal-tab" onclick="switchTab('sofa','tabel')">Tabel Referensi</button>
+      </div>
+
+      <!-- TAB HITUNG -->
+      <div id="sofa_tab_score" class="modal-tab-content active">
+        <div class="score-section">
+          <h3>🫁 1. Respirasi – PaO₂/FiO₂ (P/F ratio)</h3>
+          <div class="score-item">
+            <label>P/F ratio (mmHg)</label>
+            <select id="sf_resp">
+              <option value="0">≥400 (0 poin)</option>
+              <option value="1">300–399 (1 poin)</option>
+              <option value="2">200–299 (2 poin)</option>
+              <option value="3">100–199 + ventilasi mekanik (3 poin)</option>
+              <option value="4">&lt;100 + ventilasi mekanik (4 poin)</option>
+            </select>
+          </div>
+        </div>
+        <div class="score-section">
+          <h3>🩸 2. Koagulasi – Trombosit (×10³/µL)</h3>
+          <div class="score-item">
+            <label>Jumlah trombosit</label>
+            <select id="sf_coag">
+              <option value="0">≥150 (0 poin)</option>
+              <option value="1">100–149 (1 poin)</option>
+              <option value="2">50–99 (2 poin)</option>
+              <option value="3">20–49 (3 poin)</option>
+              <option value="4">&lt;20 (4 poin)</option>
+            </select>
+          </div>
+        </div>
+        <div class="score-section">
+          <h3>🫀 3. Hepar – Bilirubin (mg/dL)</h3>
+          <div class="score-item">
+            <label>Bilirubin total</label>
+            <select id="sf_liver">
+              <option value="0">&lt;1.2 (0 poin)</option>
+              <option value="1">1.2–1.9 (1 poin)</option>
+              <option value="2">2.0–5.9 (2 poin)</option>
+              <option value="3">6.0–11.9 (3 poin)</option>
+              <option value="4">≥12.0 (4 poin)</option>
+            </select>
+          </div>
+        </div>
+        <div class="score-section">
+          <h3>❤️ 4. Kardiovaskular – MAP & Vasopressor</h3>
+          <div class="score-item">
+            <label>Hemodinamik</label>
+            <select id="sf_cardio">
+              <option value="0">MAP ≥70 mmHg, tanpa vasopressor (0 poin)</option>
+              <option value="1">MAP &lt;70 mmHg, tanpa vasopressor (1 poin)</option>
+              <option value="2">Dopamin ≤5 mcg/kg/mnt atau Dobutamin (2 poin)</option>
+              <option value="3">Dopamin &gt;5, atau NE/Adrenalin ≤0.1 mcg/kg/mnt (3 poin)</option>
+              <option value="4">NE atau Adrenalin &gt;0.1 mcg/kg/mnt (4 poin)</option>
+            </select>
+          </div>
+        </div>
+        <div class="score-section">
+          <h3>🧠 5. Neurologis – GCS</h3>
+          <div class="score-item">
+            <label>GCS aktual</label>
+            <select id="sf_neuro">
+              <option value="0">15 (0 poin)</option>
+              <option value="1">13–14 (1 poin)</option>
+              <option value="2">10–12 (2 poin)</option>
+              <option value="3">6–9 (3 poin)</option>
+              <option value="4">&lt;6 (4 poin)</option>
+            </select>
+          </div>
+        </div>
+        <div class="score-section">
+          <h3>🫘 6. Renal – Kreatinin atau Urin Output</h3>
+          <div class="score-item">
+            <label>Kreatinin / Urine Output</label>
+            <select id="sf_renal">
+              <option value="0">Kreatinin &lt;1.2 mg/dL (0 poin)</option>
+              <option value="1">Kreatinin 1.2–1.9 mg/dL (1 poin)</option>
+              <option value="2">Kreatinin 2.0–3.4 mg/dL (2 poin)</option>
+              <option value="3">Kreatinin 3.5–4.9 atau UO &lt;500 mL/hari (3 poin)</option>
+              <option value="4">Kreatinin ≥5.0 atau UO &lt;200 mL/hari (4 poin)</option>
+            </select>
+          </div>
+        </div>
+        <button class="score-btn" style="background:linear-gradient(135deg,#C62828,#880E4F)" onclick="hitungSOFA()">🧮 Hitung Skor SOFA</button>
+        <div class="score-result-box" id="sofa_result" style="display:none; margin-top:12px"></div>
+      </div>
+
+      <!-- TAB TABEL -->
+      <div id="sofa_tab_tabel" class="modal-tab-content">
+        <div class="score-section">
+          <h3>📊 Interpretasi Skor SOFA</h3>
+          <table class="score-criteria-table">
+            <tr><th>Total SOFA</th><th>Prediksi Mortalitas ICU</th><th>Keterangan</th></tr>
+            <tr><td>0–1</td><td>&lt;1%</td><td>Normal / sangat rendah</td></tr>
+            <tr><td>2–3</td><td>~7%</td><td>Ringan – awasi ketat</td></tr>
+            <tr><td>4–5</td><td>~20%</td><td>Sedang – pertimbangkan ICU</td></tr>
+            <tr><td>6–7</td><td>~21%</td><td>Berat – sepsis bermakna</td></tr>
+            <tr><td>8–9</td><td>~33%</td><td>Berat – intervensi agresif</td></tr>
+            <tr><td>10–11</td><td>~50%</td><td>Sangat berat</td></tr>
+            <tr><td>12–14</td><td>~95%</td><td>Kritis</td></tr>
+            <tr><td>≥15</td><td>>95%</td><td>Sangat kritis</td></tr>
+          </table>
+          <div class="important-box" style="margin-top:8px">💡 <b>Definisi Sepsis-3:</b> Sepsis = Dugaan/konfirmasi infeksi + SOFA ≥2 dari baseline. <b>Syok Septik</b> = Sepsis + vasopressor diperlukan untuk MAP ≥65 + Laktat &gt;2 mmol/L meski resusitasi cairan adekuat.</div>
+        </div>
+        <div class="score-section">
+          <h3>📋 Tabel Skor per Organ</h3>
+          <table class="score-criteria-table">
+            <tr><th>Organ</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th></tr>
+            <tr><td><b>Respirasi</b> P/F</td><td>≥400</td><td>300–399</td><td>200–299</td><td>100–199+VM</td><td>&lt;100+VM</td></tr>
+            <tr><td><b>Koagulasi</b> PLT (×10³)</td><td>≥150</td><td>100–149</td><td>50–99</td><td>20–49</td><td>&lt;20</td></tr>
+            <tr><td><b>Hepar</b> Bili (mg/dL)</td><td>&lt;1.2</td><td>1.2–1.9</td><td>2–5.9</td><td>6–11.9</td><td>≥12</td></tr>
+            <tr><td><b>Kardio</b></td><td>MAP≥70</td><td>MAP&lt;70</td><td>DA≤5/Dobu</td><td>DA&gt;5/NE≤0.1</td><td>NE&gt;0.1</td></tr>
+            <tr><td><b>Neurologis</b> GCS</td><td>15</td><td>13–14</td><td>10–12</td><td>6–9</td><td>&lt;6</td></tr>
+            <tr><td><b>Renal</b> Cr (mg/dL)</td><td>&lt;1.2</td><td>1.2–1.9</td><td>2–3.4</td><td>3.5–4.9</td><td>≥5.0</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: APACHE II ====== -->
+<div class="tool-modal-overlay" id="modalAPACHE">
+  <div class="tool-modal">
+    <div class="tool-modal-header" style="background:linear-gradient(135deg,#4527A0,#283593)">
+      <span style="font-size:24px">📊</span>
+      <h2>APACHE II Score</h2>
+      <button class="tool-modal-close" onclick="closeModal('modalAPACHE')">✕</button>
+    </div>
+    <div class="tool-modal-body">
+      <p style="font-size:12px;font-family:var(--ui-font);color:#555;margin-bottom:12px">Acute Physiology and Chronic Health Evaluation II – nilai terburuk dalam 24 jam pertama ICU.</p>
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="switchTab('apache','physio')">Fisiologi Akut</button>
+        <button class="modal-tab" onclick="switchTab('apache','age')">Usia & Kesehatan</button>
+      </div>
+      <div id="apache_tab_physio" class="modal-tab-content active">
+        <div class="score-section">
+          <h3>A. Skor Fisiologi Akut (pilih skor terburuk)</h3>
+          <div class="score-item"><label>Suhu rektal (°C)</label>
+            <select id="ap_temp"><option value="4">≥41</option><option value="3">39–40.9</option><option value="1">38.5–38.9</option><option value="0" selected>36–38.4</option><option value="1">34–35.9</option><option value="2">32–33.9</option><option value="3">30–31.9</option><option value="4">≤29.9</option></select></div>
+          <div class="score-item"><label>MAP (mmHg)</label>
+            <select id="ap_map"><option value="4">≥160</option><option value="3">130–159</option><option value="2">110–129</option><option value="0" selected>70–109</option><option value="2">50–69</option><option value="4">≤49</option></select></div>
+          <div class="score-item"><label>HR (x/mnt)</label>
+            <select id="ap_hr"><option value="4">≥180</option><option value="3">140–179</option><option value="2">110–139</option><option value="0" selected>70–109</option><option value="2">55–69</option><option value="3">40–54</option><option value="4">≤39</option></select></div>
+          <div class="score-item"><label>RR (x/mnt)</label>
+            <select id="ap_rr"><option value="4">≥50</option><option value="3">35–49</option><option value="1">25–34</option><option value="0" selected>12–24</option><option value="1">10–11</option><option value="2">6–9</option><option value="4">≤5</option></select></div>
+          <div class="score-item"><label>Oksigenasi (pilih)</label>
+            <select id="ap_oxy"><option value="0" selected>PaO2≥70 (FiO2&lt;0.5)</option><option value="1">PaO2 61–70</option><option value="3">PaO2 55–60</option><option value="4">PaO2&lt;55</option><option value="0">A-aDO2&lt;200 (FiO2≥0.5)</option><option value="2">A-aDO2 200–349</option><option value="3">A-aDO2 350–499</option><option value="4">A-aDO2≥500</option></select></div>
+          <div class="score-item"><label>pH arteri</label>
+            <select id="ap_ph"><option value="4">≥7.7</option><option value="3">7.6–7.69</option><option value="1">7.5–7.59</option><option value="0" selected>7.33–7.49</option><option value="2">7.25–7.32</option><option value="3">7.15–7.24</option><option value="4">≤7.14</option></select></div>
+          <div class="score-item"><label>Na serum (mEq/L)</label>
+            <select id="ap_na"><option value="4">≥180</option><option value="3">160–179</option><option value="2">155–159</option><option value="1">150–154</option><option value="0" selected>130–149</option><option value="2">120–129</option><option value="3">111–119</option><option value="4">≤110</option></select></div>
+          <div class="score-item"><label>K serum (mEq/L)</label>
+            <select id="ap_k"><option value="4">≥7</option><option value="3">6–6.9</option><option value="1">5.5–5.9</option><option value="0" selected>3.5–5.4</option><option value="1">3–3.4</option><option value="2">2.5–2.9</option><option value="4">≤2.4</option></select></div>
+          <div class="score-item"><label>Kreatinin serum (mg/dL)<br><small>×2 jika AKI akut</small></label>
+            <select id="ap_cr"><option value="4">≥3.5</option><option value="3">2–3.4</option><option value="1">1.5–1.9</option><option value="0" selected>0.6–1.4</option><option value="2">&lt;0.6</option></select></div>
+          <div class="score-item"><label>Hematokrit (%)</label>
+            <select id="ap_hct"><option value="4">≥60</option><option value="2">50–59.9</option><option value="1">46–49.9</option><option value="0" selected>30–45.9</option><option value="1">20–29.9</option><option value="2">&lt;20</option></select></div>
+          <div class="score-item"><label>WBC (×1000/mm³)</label>
+            <select id="ap_wbc"><option value="4">≥40</option><option value="2">20–39.9</option><option value="1">15–19.9</option><option value="0" selected>3–14.9</option><option value="2">1–2.9</option><option value="4">&lt;1</option></select></div>
+          <div class="score-item"><label>GCS (gunakan 15 – GCS aktual)</label>
+            <input type="number" id="ap_gcs_val" value="0" min="0" max="15" style="width:80px;padding:5px;border:1px solid #9FA8DA;border-radius:6px;font-size:12px">
+            <small style="font-size:11px;color:#888">Poin = 15 – GCS</small>
+          </div>
+        </div>
+        <button class="score-btn" style="background:linear-gradient(135deg,#4527A0,#283593)" onclick="switchTab('apache','age');hitungAPACHE()">Lanjut → Usia & Kesehatan</button>
+      </div>
+      <div id="apache_tab_age" class="modal-tab-content">
+        <div class="score-section">
+          <h3>B. Poin Usia</h3>
+          <div class="score-item"><label>Usia pasien</label>
+            <select id="ap_age"><option value="0">≤44 th (0)</option><option value="2">45–54 th (2)</option><option value="3">55–64 th (3)</option><option value="5">65–74 th (5)</option><option value="6">≥75 th (6)</option></select></div>
+        </div>
+        <div class="score-section">
+          <h3>C. Poin Kesehatan Kronis</h3>
+          <p style="font-size:11px;font-family:var(--ui-font);color:#777;margin-bottom:8px">Jika ada riwayat penyakit berat (organ failure atau imunosupresi):</p>
+          <div class="score-item"><label>Status operasi</label>
+            <select id="ap_chronic"><option value="0">Tidak ada riwayat / non-bedah (0)</option><option value="2">Bedah elektif (2)</option><option value="5">Bedah darurat atau non-bedah (5)</option></select></div>
+        </div>
+        <button class="score-btn" style="background:linear-gradient(135deg,#4527A0,#283593)" onclick="hitungAPACHE()">📊 Hitung APACHE II</button>
+        <div class="score-result-box" id="apache_result" style="display:none; margin-top:12px"></div>
+        <div class="score-section" style="margin-top:12px">
+          <h3>📈 Prediksi Mortalitas (estimasi)</h3>
+          <table class="score-criteria-table">
+            <tr><th>Skor</th><th>Mortalitas Non-Bedah</th><th>Mortalitas Post-Op</th></tr>
+            <tr><td>0–4</td><td>~4%</td><td>~1%</td></tr>
+            <tr><td>5–9</td><td>~8%</td><td>~3%</td></tr>
+            <tr><td>10–14</td><td>~15%</td><td>~7%</td></tr>
+            <tr><td>15–19</td><td>~25%</td><td>~12%</td></tr>
+            <tr><td>20–24</td><td>~40%</td><td>~30%</td></tr>
+            <tr><td>25–29</td><td>~55%</td><td>~35%</td></tr>
+            <tr><td>30–34</td><td>~73%</td><td>~73%</td></tr>
+            <tr><td>≥35</td><td>~85%</td><td>~88%</td></tr>
+          </table>
+          <div class="important-box" style="margin-top:8px">💡 APACHE II adalah estimasi populasi – bukan prediksi individual. Gunakan sebagai alat komunikasi, bukan justifikasi penghentian terapi.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: ASAM BASA ====== -->
+<div class="tool-modal-overlay" id="modalAcidBase">
+  <div class="tool-modal">
+    <div class="tool-modal-header" style="background:linear-gradient(135deg,#00695C,#00838F)">
+      <span style="font-size:24px">🩸</span>
+      <h2>Kalkulator Keseimbangan Asam-Basa</h2>
+      <button class="tool-modal-close" onclick="closeModal('modalAcidBase')">✕</button>
+    </div>
+    <div class="tool-modal-body">
+      <div class="score-section">
+        <h3>📥 Input Nilai AGD (Analisa Gas Darah)</h3>
+        <div class="titrasi-row"><label>pH:</label><input type="number" id="ab_ph" value="7.40" step="0.01" min="6.8" max="7.8"></div>
+        <div class="titrasi-row"><label>PaCO₂ (mmHg):</label><input type="number" id="ab_pco2" value="40" step="1"></div>
+        <div class="titrasi-row"><label>HCO₃⁻ (mEq/L):</label><input type="number" id="ab_hco3" value="24" step="0.1"></div>
+        <div class="titrasi-row"><label>Na⁺ (mEq/L) – opsional:</label><input type="number" id="ab_na" value="140" step="1"></div>
+        <div class="titrasi-row"><label>Cl⁻ (mEq/L) – opsional:</label><input type="number" id="ab_cl" value="104" step="1"></div>
+        <div class="titrasi-row"><label>Albumin (g/dL) – opsional:</label><input type="number" id="ab_alb" value="4.0" step="0.1"></div>
+        <button class="score-btn" style="background:linear-gradient(135deg,#00695C,#00838F)" onclick="hitungAcidBase()">🔬 Interpretasi AGD</button>
+      </div>
+      <div id="ab_result" style="display:none">
+        <div class="titrasi-result" id="ab_result_text" style="font-size:16px;line-height:1.9"></div>
+        <div class="score-section" style="margin-top:12px" id="ab_detail_section">
+          <h3>🔍 Detail & Kompensasi</h3>
+          <div id="ab_compensation_text" style="font-size:13px;font-family:var(--ui-font);line-height:1.8"></div>
+        </div>
+      </div>
+      <div class="score-section">
+        <h3>📚 Nilai Normal AGD</h3>
+        <table class="score-criteria-table">
+          <tr><th>Parameter</th><th>Normal</th><th>Asidosis</th><th>Alkalosis</th></tr>
+          <tr><td>pH</td><td>7.35–7.45</td><td>&lt;7.35</td><td>&gt;7.45</td></tr>
+          <tr><td>PaCO₂</td><td>35–45 mmHg</td><td>&gt;45 (resp)</td><td>&lt;35 (resp)</td></tr>
+          <tr><td>HCO₃⁻</td><td>22–26 mEq/L</td><td>&lt;22 (met)</td><td>&gt;26 (met)</td></tr>
+          <tr><td>PaO₂</td><td>80–100 mmHg</td><td colspan="2">–</td></tr>
+          <tr><td>SpO₂</td><td>95–100%</td><td colspan="2">–</td></tr>
+          <tr><td>BE</td><td>-2 s/d +2</td><td>&lt;-2</td><td>&gt;+2</td></tr>
+        </table>
+      </div>
+      <div class="score-section">
+        <h3>🧮 Rumus Kompensasi</h3>
+        <table class="score-criteria-table">
+          <tr><th>Gangguan</th><th>Kompensasi yang diharapkan</th></tr>
+          <tr><td>Asidosis Metabolik</td><td>PaCO₂ = (1.5 × HCO₃) + 8 ± 2 <i>(Winters)</i></td></tr>
+          <tr><td>Alkalosis Metabolik</td><td>PaCO₂ meningkat 0.7 per ↑1 HCO₃</td></tr>
+          <tr><td>Asidosis Respiratorik Akut</td><td>HCO₃ meningkat 1 per ↑10 PaCO₂</td></tr>
+          <tr><td>Asidosis Respiratorik Kronik</td><td>HCO₃ meningkat 3.5 per ↑10 PaCO₂</td></tr>
+          <tr><td>Alkalosis Respiratorik Akut</td><td>HCO₃ turun 2 per ↓10 PaCO₂</td></tr>
+          <tr><td>Alkalosis Respiratorik Kronik</td><td>HCO₃ turun 5 per ↓10 PaCO₂</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: VENTILATOR ====== -->
+<div class="tool-modal-overlay" id="modalVentilator">
+  <div class="tool-modal">
+    <div class="tool-modal-header" style="background:linear-gradient(135deg,#558B2F,#33691E)">
+      <span style="font-size:24px">🫁</span>
+      <h2>Interpretasi Monitor & Ventilator</h2>
+      <button class="tool-modal-close" onclick="closeModal('modalVentilator')">✕</button>
+    </div>
+    <div class="tool-modal-body">
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="switchTab('vent','params')">Parameter</button>
+        <button class="modal-tab" onclick="switchTab('vent','alarm')">Alarm & Troubleshooting</button>
+        <button class="modal-tab" onclick="switchTab('vent','modes')">Mode Ventilator</button>
+        <button class="modal-tab" onclick="switchTab('vent','monitor')">Monitor ICU</button>
+      </div>
+
+      <!-- TAB: PARAMETER -->
+      <div id="vent_tab_params" class="modal-tab-content active">
+        <div class="score-section">
+          <h3>📊 Parameter Ventilator & Nilai Target</h3>
+          <table class="score-criteria-table">
+            <tr><th>Parameter</th><th>Nilai Normal/Target</th><th>Interpretasi</th></tr>
+            <tr><td><b>FiO₂</b></td><td>0.21–1.0 (target ≤0.6)</td><td>Fraksi O₂ yang dihirup. FiO₂ tinggi lama → toksisitas O₂</td></tr>
+            <tr><td><b>Tidal Volume (VT)</b></td><td>6–8 mL/kg IBW</td><td>ARDS: 4–6 mL/kg IBW. Lebih rendah = lung-protective</td></tr>
+            <tr><td><b>RR/Freq</b></td><td>12–20 x/mnt</td><td>RR tinggi + VT kecil → hiperventilasi → resp alkalosis</td></tr>
+            <tr><td><b>PEEP</b></td><td>5 cmH₂O (standar)<br>8–15 ARDS</td><td>Mencegah alveoli kolaps. PEEP tinggi → ↓CO, barotrauma</td></tr>
+            <tr><td><b>Peak Pressure (Ppeak)</b></td><td>&lt;35 cmH₂O</td><td>&gt;35: resistensi jalan napas ↑ (sekresi, spasme, ETT tertekuk)</td></tr>
+            <tr><td><b>Plateau Pressure (Pplat)</b></td><td>&lt;30 cmH₂O</td><td>Refleksi compliance paru. &gt;30 = risiko volutrauma/barotrauma</td></tr>
+            <tr><td><b>Driving Pressure</b></td><td>&lt;15 cmH₂O</td><td>Pplat − PEEP. Prediktor mortalitas ARDS terbaik</td></tr>
+            <tr><td><b>Compliance dinamis</b></td><td>40–80 mL/cmH₂O</td><td>VT ÷ (Ppeak − PEEP). Turun = paru kaku / atelektasis</td></tr>
+            <tr><td><b>Compliance statis</b></td><td>60–100 mL/cmH₂O</td><td>VT ÷ (Pplat − PEEP). Lebih akurat dari dinamis</td></tr>
+            <tr><td><b>I:E Ratio</b></td><td>1:2 (standar)</td><td>ARDS: 1:1–1:1.5. PPOK/asma: 1:3–1:4 (auto-PEEP!</td></tr>
+            <tr><td><b>SpO₂</b></td><td>94–98% (ARDS: 88–92%)</td><td>SpO₂ &lt;88% → naikkan PEEP/FiO₂. &gt;98% → turunkan FiO₂</td></tr>
+            <tr><td><b>EtCO₂</b></td><td>35–45 mmHg</td><td>Konfirmasi intubasi, monitoring ventilasi, prognostik ROSC</td></tr>
+            <tr><td><b>MV (Minute Volume)</b></td><td>5–8 L/mnt</td><td>= VT × RR. Naik pada metabolisme ↑, turun = hipoventilasi</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: ALARM -->
+      <div id="vent_tab_alarm" class="modal-tab-content">
+        <div class="score-section">
+          <h3>🚨 Alarm Tinggi & Penanganan</h3>
+          <div class="interp-card interp-red"><b>HIGH PRESSURE ALARM</b><br>
+            Penyebab: Obstruksi ETT (tekuk, sekresi), bronkospasme, pneumotoraks, fighting ventilator, biting tube<br>
+            → Suction ETT · Check posisi tube · Bronkodilator · Analgesik/sedasi · CXR</div>
+          <div class="interp-card interp-orange"><b>LOW PRESSURE / DISCONNECT ALARM</b><br>
+            Penyebab: Sirkuit lepas, cuff bocor, ETT terekstubasi<br>
+            → Cek semua koneksi · Cek cuff pressure (20–30 cmH₂O) · Konfirmasi posisi ETT</div>
+          <div class="interp-card interp-red"><b>LOW SpO₂</b><br>
+            Penyebab: FiO₂ kurang, atelektasis, pneumonia, pneumotoraks, edema paru, ETT mainstem<br>
+            → Naikkan FiO₂ · Suction · Lung recruitment · CXR · Cek posisi ETT (5±2 cm carina)</div>
+          <div class="interp-card interp-orange"><b>APNEA ALARM</b><br>
+            Penyebab: Oversedasi, neuromuskular residual, henti napas<br>
+            → Cek level sedasi · Stimulasi pasien · Backup rate atau ventilasi manual</div>
+          <div class="interp-card interp-yellow"><b>AUTO-PEEP (PEEP Intrinsik)</b><br>
+            Penyebab: I:E tidak adekuat (terutama PPOK/asma), RR terlalu tinggi<br>
+            → Panjangkan waktu ekspirasi · Turunkan RR · Bronkodilator</div>
+        </div>
+      </div>
+
+      <!-- TAB: MODES -->
+      <div id="vent_tab_modes" class="modal-tab-content">
+        <div class="score-section">
+          <h3>⚙️ Mode Ventilator – Perbandingan</h3>
+          <table class="score-criteria-table">
+            <tr><th>Mode</th><th>Keterangan</th><th>Indikasi</th></tr>
+            <tr><td><b>VC (Volume Control)</b></td><td>VT tetap, pressure bervariasi. RR diset.</td><td>Kontrol penuh, ARDS (VT target 6 mL/kg)</td></tr>
+            <tr><td><b>PC (Pressure Control)</b></td><td>Pressure tetap, VT bervariasi. Lung-protective jika compliance berubah.</td><td>ARDS berat, compliance rendah</td></tr>
+            <tr><td><b>SIMV</b></td><td>Napas mesin + napas spontan. Kombinasi.</td><td>Weaning bertahap – namun lebih lambat dari PSV</td></tr>
+            <tr><td><b>PSV (Pressure Support)</b></td><td>Tiap napas spontan diberi support tekanan. Pasien kontrol RR & Ti.</td><td>Weaning, CPAP trial, pasien sadar</td></tr>
+            <tr><td><b>CPAP</b></td><td>Tekanan positif kontinu tanpa backup. Napas seluruhnya spontan.</td><td>Pre-ekstubasi trial, sleep apnea, post-ekstubasi</td></tr>
+            <tr><td><b>PRVC / VTPC</b></td><td>Target VT, tapi diatur via pressure control. Adaptif.</td><td>Alternatif ARDS – gabungan keunggulan VC+PC</td></tr>
+            <tr><td><b>APRV (Airway Pressure Release Ventilation)</b></td><td>High CPAP lama + low pressure singkat. Napas spontan bebas.</td><td>ARDS berat, refrakter hipoksemia</td></tr>
+          </table>
+          <div class="important-box" style="margin-top:8px">💡 Weaning optimal: Lakukan SBT (Spontaneous Breathing Trial) PSV 5/5 atau T-piece 30–120 menit. Kriteria lulus: RR&lt;35, SpO₂&gt;90%, tidak distress. Pertimbangkan ekstubasi jika lulus.</div>
+        </div>
+      </div>
+
+      <!-- TAB: MONITOR ICU -->
+      <div id="vent_tab_monitor" class="modal-tab-content">
+        <div class="score-section">
+          <h3>🖥️ Interpretasi Monitor Hemodinamik ICU</h3>
+          <table class="score-criteria-table">
+            <tr><th>Parameter</th><th>Normal</th><th>Abnormal & Makna</th></tr>
+            <tr><td><b>Tekanan Darah</b></td><td>MAP ≥65 mmHg<br>SBP 90–140</td><td>MAP &lt;65 → perfusi organ inadekuat → vasopressor. MAP &gt;110 → risiko perdarahan, hentikan vasopresor bertahap</td></tr>
+            <tr><td><b>CVP</b></td><td>2–8 mmHg</td><td>&lt;2: hipovolemia berat. &gt;12: overload/gagal jantung kanan. Sendiri kurang akurat menilai preload</td></tr>
+            <tr><td><b>Pulse Pressure Variation (PPV)</b></td><td>&lt;13% = fluid non-responsive</td><td>&gt;13% (napas kontrol): responsif cairan → bolus. Tidak valid pada aritmia / napas spontan</td></tr>
+            <tr><td><b>Stroke Volume Variation (SVV)</b></td><td>&lt;13% = adekuat</td><td>Sama dengan PPV – lebih akurat dengan monitoring CO</td></tr>
+            <tr><td><b>ScvO₂ / SvO₂</b></td><td>ScvO₂ &gt;70%<br>SvO₂ &gt;65%</td><td>&lt;70%: ekstraksi O₂ ↑ → CO rendah / anemia. &gt;80%: distribusi O₂ gagal (sepsis), pirau AV</td></tr>
+            <tr><td><b>Laktat</b></td><td>&lt;2 mmol/L</td><td>&gt;2: hipoperfusi jaringan. &gt;4: sepsis berat, resusitasi agresif. Laktat clearance &gt;10%/2 jam = target tercapai</td></tr>
+            <tr><td><b>Suhu</b></td><td>36.5–37.5°C</td><td>Demam &gt;38.3: cari sumber infeksi/kultur. Hipotermia &lt;36: sepsis berat, hipotermia terapeutik pasca CA</td></tr>
+            <tr><td><b>Urine Output</b></td><td>≥0.5 mL/kg/jam</td><td>&lt;0.5 mL/kg/jam ≥2 jam: AKI. Oliguria + MAP rendah: resusitasi cairan / vasopressor</td></tr>
+          </table>
+        </div>
+        <div class="score-section">
+          <h3>🔔 Gelombang EKG di Monitor – Identifikasi Cepat</h3>
+          <div class="interp-card interp-red"><b>VF (Ventricular Fibrillation):</b> Gelombang kacau, tidak teratur, tidak ada QRS → CPR + DC Shock tidak sinkron segera!</div>
+          <div class="interp-card interp-red"><b>VT Tanpa Nadi:</b> QRS lebar &gt;0.12 detik, cepat, reguler, tidak ada nadi → CPR + DC Shock</div>
+          <div class="interp-card interp-orange"><b>VT dengan Nadi (stabil):</b> QRS lebar, HR &gt;100, ada nadi → Amiodarone 150 mg/10 mnt → DC Sync jika tidak stabil</div>
+          <div class="interp-card interp-orange"><b>SVT:</b> Sempit &lt;0.12 detik, cepat reguler → Vagal manuver → Adenosin 6 mg IV push</div>
+          <div class="interp-card interp-yellow"><b>AF:</b> Irregular tidak beraturan, tidak ada P wave yang jelas → Rate control (Digoksin, Beta bloker) atau Rhythm control</div>
+          <div class="interp-card interp-yellow"><b>Bradikardi Simtomatis (&lt;60 + hemodinamik buruk):</b> → Atropin 0.5 mg IV, ulang hingga 3 mg → Transcutaneous pacing</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Install Prompt -->
+<div class="install-prompt" id="installPrompt">
+  <h4>📲 Pasang di Homescreen</h4>
+  <p>Buka catatan ini seperti aplikasi, bisa offline!</p>
+  <div class="install-prompt-btns">
+    <button class="btn-install" onclick="installApp()">Pasang</button>
+    <button class="btn-dismiss" onclick="dismissInstall()">Nanti</button>
+  </div>
+</div>
+
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
